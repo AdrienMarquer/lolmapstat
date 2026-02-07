@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+
+# Source/working assets (not needed at runtime)
+assets/
+
+# Large map model (215MB — download separately)
+public/models/map/
+
+# Screenshots and test artifacts
+*.png
+test-results/

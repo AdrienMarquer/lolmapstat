@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LoL Map Stat</title>
+  </head>
+  <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <h1>LoL Map Stat</h1>
+      <div id="loading-bar">
+        <div id="loading-bar-fill"></div>
+      </div>
+      <p id="loading-percent">0%</p>
+    </div>
+
+    <!-- 3D Canvas -->
+    <canvas id="canvas3d"></canvas>
+
+    <!-- UI Overlay -->
+    <div id="ui-overlay">
+      <!-- Left Navigation Arrow -->
+      <button class="nav-arrow nav-arrow--left" id="nav-left">
+        <span class="nav-arrow__icon">&#9664;</span>
+        <span class="nav-arrow__label" id="nav-left-label"></span>
+      </button>
+
+      <!-- Right Navigation Arrow -->
+      <button class="nav-arrow nav-arrow--right" id="nav-right">
+        <span class="nav-arrow__label" id="nav-right-label"></span>
+        <span class="nav-arrow__icon">&#9654;</span>
+      </button>
+
+      <!-- Champion Info Card -->
+      <div id="champion-card">
+        <div id="champ-header">
+          <div id="champ-name">—</div>
+          <div id="champ-role">—</div>
+        </div>
+        <div id="champ-player">—</div>
+        <span id="champ-rank">—</span>
+
+        <div id="champ-stats">
+          <div class="stat-item">
+            <span class="stat-value" id="stat-games">—</span>
+            <span class="stat-label">Games</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-winrate">—</span>
+            <span class="stat-label">Win Rate</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-value" id="stat-kda">—</span>
+            <span class="stat-label">KDA</span>
+          </div>
+        </div>
+
+        <div id="champ-avg">
+          <span id="avg-kills">—</span> /
+          <span id="avg-deaths">—</span> /
+          <span id="avg-assists">—</span>
+        </div>
+
+        <div id="champ-recent">
+          <span id="recent-label">Last 5</span>
+          <div id="recent-dots"></div>
+          <span id="recent-streak"></span>
+        </div>
+      </div>
+
+      <!-- Sketchfab Credit -->
+      <div id="credit">
+        Map by <a href="https://sketchfab.com/Jenioss" target="_blank" rel="noopener">Jenioss</a>
+        · CC-BY-NC-ND-4.0
+      </div>
+    </div>
+
+    <!-- Debug Overlay -->
+    <div id="debug-panel">
+      <div>Mouse: <span id="debug-mouse">—</span></div>
+      <div>Cam pos: <span id="debug-cam-pos">—</span></div>
+      <div>Cam rot: <span id="debug-cam-rot">—</span></div>
+      <div>Zoom: <span id="debug-zoom">—</span></div>
+      <div>Champ rot: <span id="debug-champ-rot">—</span></div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

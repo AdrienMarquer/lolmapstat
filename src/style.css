@@ -1,0 +1,347 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  background: #0a0a1a;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  color: #e0dcd0;
+}
+
+#canvas3d {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ── Loading Screen ── */
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 100%);
+  transition: opacity 0.8s ease;
+}
+
+#loading-screen h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #c8a832;
+  margin-bottom: 2rem;
+}
+
+#loading-bar {
+  width: 300px;
+  height: 4px;
+  background: rgba(200, 168, 50, 0.15);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+#loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #c8a832, #f0d060);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+#loading-percent {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: rgba(200, 168, 50, 0.7);
+  letter-spacing: 0.1em;
+}
+
+/* ── UI Overlay ── */
+#ui-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+#ui-overlay.visible {
+  opacity: 1;
+}
+
+/* ── Navigation Arrows ── */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: all;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  background: rgba(10, 10, 26, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 168, 50, 0.25);
+  border-radius: 12px;
+  color: #c8a832;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.nav-arrow:hover {
+  background: rgba(200, 168, 50, 0.12);
+  border-color: rgba(200, 168, 50, 0.5);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.nav-arrow:active {
+  transform: translateY(-50%) scale(0.97);
+}
+
+.nav-arrow--left {
+  left: 1.5rem;
+}
+
+.nav-arrow--right {
+  right: 1.5rem;
+}
+
+.nav-arrow__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.nav-arrow__label {
+  font-size: 0.85rem;
+  color: rgba(224, 220, 208, 0.7);
+  white-space: nowrap;
+}
+
+/* ── Champion Card ── */
+#champion-card {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: all;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1.25rem 2rem;
+  background: rgba(10, 10, 26, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(200, 168, 50, 0.2);
+  border-radius: 16px;
+  min-width: 280px;
+}
+
+#champ-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+#champ-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #f0e6c8;
+  letter-spacing: 0.05em;
+}
+
+#champ-role {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(200, 168, 50, 0.7);
+}
+
+#champ-player {
+  font-size: 0.85rem;
+  color: rgba(224, 220, 208, 0.5);
+}
+
+#champ-rank {
+  display: inline-block;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Stats row */
+#champ-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #f0e6c8;
+}
+
+.stat-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(224, 220, 208, 0.4);
+}
+
+.stat-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(200, 168, 50, 0.2);
+}
+
+/* Avg KDA line */
+#champ-avg {
+  font-size: 0.75rem;
+  color: rgba(224, 220, 208, 0.45);
+}
+
+#avg-kills {
+  color: #5b9bd5;
+}
+
+#avg-deaths {
+  color: #e05555;
+}
+
+#avg-assists {
+  color: #7ec87e;
+}
+
+/* Recent form */
+#champ-recent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#recent-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(224, 220, 208, 0.35);
+}
+
+#recent-dots {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.recent-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.recent-dot--win {
+  background: #5bbd5b;
+}
+
+.recent-dot--loss {
+  background: #e05555;
+}
+
+#recent-streak {
+  font-size: 0.65rem;
+  color: rgba(224, 220, 208, 0.4);
+}
+
+/* ── Credit ── */
+#credit {
+  position: absolute;
+  bottom: 0.75rem;
+  right: 1rem;
+  pointer-events: all;
+  font-size: 0.65rem;
+  color: rgba(224, 220, 208, 0.3);
+}
+
+#credit a {
+  color: rgba(200, 168, 50, 0.5);
+  text-decoration: none;
+}
+
+#credit a:hover {
+  color: #c8a832;
+}
+
+/* ── Debug Panel ── */
+#debug-panel {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 200;
+  padding: 0.5rem 0.75rem;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 6px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
+  line-height: 1.6;
+  color: #0f0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .nav-arrow__label {
+    display: none;
+  }
+
+  .nav-arrow {
+    padding: 0.75rem 1rem;
+  }
+
+  #champion-card {
+    padding: 1rem 1.25rem;
+    min-width: unset;
+  }
+
+  #champ-name {
+    font-size: 1.1rem;
+  }
+
+  .stat-value {
+    font-size: 0.85rem;
+  }
+
+  #champ-stats {
+    gap: 0.5rem;
+  }
+
+  #loading-screen h1 {
+    font-size: 1.3rem;
+    letter-spacing: 0.2em;
+  }
+
+  #loading-bar {
+    width: 220px;
+  }
+}
