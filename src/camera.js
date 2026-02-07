@@ -2,7 +2,6 @@ import { gsap } from 'gsap';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { camera, renderer } from './scene.js';
 import { CHAMPIONS, NAV_ORDER, getChampionById, getNavNeighbors } from './data.js';
-import { setAnimationsPaused } from './champions.js';
 
 export let controls;
 let currentChampionId = NAV_ORDER[0];
@@ -35,17 +34,11 @@ export function flyToChampion(id, onComplete) {
   controls.enabled = false;
   currentChampionId = id;
 
-  // Performance: lower pixel ratio + pause animations during fly-to
-  renderer.setPixelRatio(1);
-  setAnimationsPaused(true);
-
   const cp = champ.camera.position;
   const cl = champ.camera.lookAt;
 
   const tl = gsap.timeline({
     onComplete: () => {
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      setAnimationsPaused(false);
       controls.enabled = true;
       isAnimating = false;
       if (onComplete) onComplete();
@@ -61,8 +54,8 @@ export function flyToChampion(id, onComplete) {
       x: cp.x,
       y: cp.y,
       z: cp.z,
-      duration: 2,
-      ease: 'power2.inOut',
+      duration: 1.2,
+      ease: 'power3.inOut',
     },
     0
   );
@@ -73,8 +66,8 @@ export function flyToChampion(id, onComplete) {
       x: cl.x,
       y: cl.y,
       z: cl.z,
-      duration: 2,
-      ease: 'power2.inOut',
+      duration: 1.2,
+      ease: 'power3.inOut',
     },
     0
   );

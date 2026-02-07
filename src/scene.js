@@ -7,6 +7,7 @@ export function initScene() {
   renderer = new THREE.WebGLRenderer({
     canvas: document.getElementById('canvas3d'),
     antialias: true,
+    powerPreference: 'high-performance',
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));

@@ -182,7 +182,10 @@ async function init() {
   // 6. Wait for all assets (textures etc.) to finish
   await allLoadedPromise;
 
-  // 7. Setup camera controls (after scene is populated)
+  // 7. Pre-compile all shaders & upload textures while loading screen is visible
+  await renderer.compileAsync(scene, camera);
+
+  // 8. Setup camera controls (after scene is populated)
   initControls();
 
   // 8. Setup UI interactions

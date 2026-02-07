@@ -111,13 +111,33 @@ function updateNavLabels(championId) {
   $('#nav-right-label').textContent = neighbors.right.summonerName;
 }
 
+const LOADING_TEXTS = [
+  'Dressage de Migi...',
+  'Chargement des couilles de Bole...',
+  'Inscription au sauna californien...',
+  'Recherche du baton a caca...',
+];
+let loadingTextIndex = 0;
+let loadingTextInterval = null;
+
+function startLoadingTexts() {
+  const el = $('#loading-text');
+  el.textContent = LOADING_TEXTS[0];
+  loadingTextInterval = setInterval(() => {
+    loadingTextIndex = (loadingTextIndex + 1) % LOADING_TEXTS.length;
+    el.textContent = LOADING_TEXTS[loadingTextIndex];
+  }, 2500);
+}
+
 export function updateLoadingProgress(progress) {
+  if (!loadingTextInterval) startLoadingTexts();
   const pct = Math.round(progress * 100);
   $('#loading-bar-fill').style.width = `${pct}%`;
   $('#loading-percent').textContent = `${pct}%`;
 }
 
 export function hideLoadingScreen() {
+  if (loadingTextInterval) clearInterval(loadingTextInterval);
   const loading = $('#loading-screen');
   loading.style.opacity = '0';
   loading.style.pointerEvents = 'none';
