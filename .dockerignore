@@ -1,0 +1,7 @@
+node_modules
+dist
+assets
+.git
+.github
+*.md
+test-results

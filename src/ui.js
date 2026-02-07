@@ -41,8 +41,6 @@ function updateChampionCard(championId) {
   if (!champ) return;
 
   $('#champ-name').textContent = champ.summonerName;
-  $('#champ-role').textContent = champ.role;
-  $('#champ-player').textContent = champ.name;
 
   // Rank badge
   const rankBadge = $('#champ-rank');

@@ -5,6 +5,7 @@ import { scene } from './scene.js';
 
 const championModels = {};
 const mixers = [];
+let animationsPaused = false;
 
 export async function loadChampions() {
   const promises = CHAMPIONS.map(async (champ) => {
@@ -34,9 +35,14 @@ export async function loadChampions() {
 }
 
 export function updateAnimations(delta) {
+  if (animationsPaused) return;
   for (const mixer of mixers) {
     mixer.update(delta);
   }
+}
+
+export function setAnimationsPaused(paused) {
+  animationsPaused = paused;
 }
 
 export function getChampionModel(id) {

@@ -9,56 +9,126 @@ import { fetchAccountData } from './data.js';
 import { getCurrentChampionId } from './camera.js';
 
 const clock = new THREE.Clock();
+const isDev = import.meta.env.DEV;
 
-// ── Debug overlay ──
-const raycaster = new THREE.Raycaster();
-const mouse = new THREE.Vector2();
-const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.04); // Y ≈ 0.04 ground
-const intersectPt = new THREE.Vector3();
+// ── Debug (dev only) ──
+let updateDebug = () => {};
 
-const debugMouse = document.getElementById('debug-mouse');
-const debugCamPos = document.getElementById('debug-cam-pos');
-const debugCamRot = document.getElementById('debug-cam-rot');
-const debugZoom = document.getElementById('debug-zoom');
-const debugChampRot = document.getElementById('debug-champ-rot');
+if (isDev) {
+  const raycaster = new THREE.Raycaster();
+  const mouse = new THREE.Vector2();
+  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.04);
+  const intersectPt = new THREE.Vector3();
 
-// ── Champion rotation (Q/E keys) ──
-const keysPressed = {};
-window.addEventListener('keydown', (e) => { keysPressed[e.key.toLowerCase()] = true; });
-window.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
+  const debugMouse = document.getElementById('debug-mouse');
+  const debugCamPos = document.getElementById('debug-cam-pos');
+  const debugCamRot = document.getElementById('debug-cam-rot');
+  const debugZoom = document.getElementById('debug-zoom');
+  const debugChampPos = document.getElementById('debug-champ-pos');
+  const debugChampRot = document.getElementById('debug-champ-rot');
 
-window.addEventListener('mousemove', (e) => {
-  mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-});
+  const STEP = 0.1;
+  const ROT_STEP = 5;
 
-function updateDebug() {
-  // Mouse → world position on map ground plane
-  raycaster.setFromCamera(mouse, camera);
-  const hit = raycaster.ray.intersectPlane(groundPlane, intersectPt);
-  if (hit) {
-    debugMouse.textContent = `X: ${intersectPt.x.toFixed(1)}  Z: ${intersectPt.z.toFixed(1)}`;
-  }
+  document.getElementById('debug-copy').addEventListener('click', () => {
+    const id = getCurrentChampionId();
+    const m = getChampionModel(id);
+    const p = camera.position;
+    const r = camera.rotation;
+    const toDeg = THREE.MathUtils.radToDeg;
+    const dist = controls ? camera.position.distanceTo(controls.target).toFixed(2) : '?';
+    const config = [
+      `Champion: ${id}`,
+      `Champ pos: X: ${m.position.x.toFixed(1)}  Z: ${m.position.z.toFixed(1)}`,
+      `Champ rot: Y: ${toDeg(m.rotation.y).toFixed(1)}°`,
+      `Cam pos: X: ${p.x.toFixed(1)}  Y: ${p.y.toFixed(1)}  Z: ${p.z.toFixed(1)}`,
+      `Cam rot: X: ${toDeg(r.x).toFixed(1)}°  Y: ${toDeg(r.y).toFixed(1)}°  Z: ${toDeg(r.z).toFixed(1)}°`,
+      `Zoom: ${dist}`,
+    ].join('\n');
+    navigator.clipboard.writeText(config);
+    const btn = document.getElementById('debug-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy config'; }, 1500);
+  });
 
-  // Camera
-  const p = camera.position;
-  debugCamPos.textContent = `X: ${p.x.toFixed(1)}  Y: ${p.y.toFixed(1)}  Z: ${p.z.toFixed(1)}`;
+  document.getElementById('debug-controls').addEventListener('click', (e) => {
+    const action = e.target.dataset.action;
+    if (!action) return;
 
-  const r = camera.rotation;
-  const toDeg = THREE.MathUtils.radToDeg;
-  debugCamRot.textContent = `X: ${toDeg(r.x).toFixed(1)}°  Y: ${toDeg(r.y).toFixed(1)}°  Z: ${toDeg(r.z).toFixed(1)}°`;
+    const m = getChampionModel(getCurrentChampionId());
 
-  // Zoom (distance from camera to orbit target)
-  if (controls) {
-    const dist = camera.position.distanceTo(controls.target);
-    debugZoom.textContent = dist.toFixed(2);
-  }
+    if (action.startsWith('cam-')) {
+      const t = controls.target;
+      switch (action) {
+        case 'cam-left':  camera.position.x -= STEP; t.x -= STEP; break;
+        case 'cam-right': camera.position.x += STEP; t.x += STEP; break;
+        case 'cam-down':  camera.position.y -= STEP; t.y -= STEP; break;
+        case 'cam-up':    camera.position.y += STEP; t.y += STEP; break;
+        case 'cam-back':  camera.position.z -= STEP; t.z -= STEP; break;
+        case 'cam-fwd':   camera.position.z += STEP; t.z += STEP; break;
+      }
+      controls.update();
+    }
 
-  // Current champion rotation
-  const model = getChampionModel(getCurrentChampionId());
-  if (model) {
-    debugChampRot.textContent = `Y: ${THREE.MathUtils.radToDeg(model.rotation.y).toFixed(1)}°`;
-  }
+    if (action.startsWith('champ-') && m) {
+      switch (action) {
+        case 'champ-left':  m.position.x -= STEP; break;
+        case 'champ-right': m.position.x += STEP; break;
+        case 'champ-back':  m.position.z -= STEP; break;
+        case 'champ-fwd':   m.position.z += STEP; break;
+        case 'champ-rotl':  m.rotation.y += THREE.MathUtils.degToRad(ROT_STEP); break;
+        case 'champ-rotr':  m.rotation.y -= THREE.MathUtils.degToRad(ROT_STEP); break;
+      }
+    }
+  });
+
+  const keysPressed = {};
+  window.addEventListener('keydown', (e) => { keysPressed[e.key.toLowerCase()] = true; });
+  window.addEventListener('keyup', (e) => { keysPressed[e.key.toLowerCase()] = false; });
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+  });
+
+  updateDebug = () => {
+    raycaster.setFromCamera(mouse, camera);
+    const hit = raycaster.ray.intersectPlane(groundPlane, intersectPt);
+    if (hit) {
+      debugMouse.textContent = `X: ${intersectPt.x.toFixed(1)}  Z: ${intersectPt.z.toFixed(1)}`;
+    }
+
+    const p = camera.position;
+    debugCamPos.textContent = `X: ${p.x.toFixed(1)}  Y: ${p.y.toFixed(1)}  Z: ${p.z.toFixed(1)}`;
+
+    const r = camera.rotation;
+    const toDeg = THREE.MathUtils.radToDeg;
+    debugCamRot.textContent = `X: ${toDeg(r.x).toFixed(1)}°  Y: ${toDeg(r.y).toFixed(1)}°  Z: ${toDeg(r.z).toFixed(1)}°`;
+
+    if (controls) {
+      const dist = camera.position.distanceTo(controls.target);
+      debugZoom.textContent = dist.toFixed(2);
+    }
+
+    const model = getChampionModel(getCurrentChampionId());
+    if (model) {
+      debugChampPos.textContent = `X: ${model.position.x.toFixed(1)}  Z: ${model.position.z.toFixed(1)}`;
+      debugChampRot.textContent = `Y: ${THREE.MathUtils.radToDeg(model.rotation.y).toFixed(1)}°`;
+    }
+
+    // Rotate current champion with Q/E
+    const champModel = getChampionModel(getCurrentChampionId());
+    if (champModel) {
+      const speed = 2.0;
+      const delta = clock.getDelta() || 0.016;
+      if (keysPressed['q']) champModel.rotation.y += speed * delta;
+      if (keysPressed['e']) champModel.rotation.y -= speed * delta;
+    }
+  };
+} else {
+  // Hide debug panel in production
+  const debugPanel = document.getElementById('debug-panel');
+  if (debugPanel) debugPanel.style.display = 'none';
 }
 
 async function init() {
@@ -97,6 +167,13 @@ async function init() {
 
     mat.depthWrite = true;
     mat.needsUpdate = true;
+
+    // Ensure each mesh has a tight bounding box for frustum culling
+    if (child.geometry) {
+      child.geometry.computeBoundingBox();
+      child.geometry.computeBoundingSphere();
+    }
+    child.frustumCulled = true;
   });
 
   // 5. Fetch live account data + Load champions (in parallel)
@@ -115,10 +192,12 @@ async function init() {
   hideLoadingScreen();
 
   // Debug: expose to console for calibration
-  window.__scene = scene;
-  window.__camera = camera;
-  window.__renderer = renderer;
-  window.__THREE = THREE;
+  if (isDev) {
+    window.__scene = scene;
+    window.__camera = camera;
+    window.__renderer = renderer;
+    window.__THREE = THREE;
+  }
 
   // 10. Start render loop
   animate();
@@ -127,14 +206,6 @@ async function init() {
 function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
-
-  // Rotate current champion with Q/E
-  const model = getChampionModel(getCurrentChampionId());
-  if (model) {
-    const speed = 2.0; // radians per second
-    if (keysPressed['q']) model.rotation.y += speed * delta;
-    if (keysPressed['e']) model.rotation.y -= speed * delta;
-  }
 
   updateAnimations(delta);
   updateControls();

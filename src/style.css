@@ -305,8 +305,62 @@ body {
   font-size: 0.7rem;
   line-height: 1.6;
   color: #0f0;
-  pointer-events: none;
+  pointer-events: all;
   user-select: none;
+}
+
+#debug-copy {
+  margin-top: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(0, 255, 0, 0.15);
+  border: 1px solid #0f0;
+  border-radius: 4px;
+  color: #0f0;
+  font-family: inherit;
+  font-size: 0.65rem;
+  cursor: pointer;
+}
+
+#debug-copy:hover {
+  background: rgba(0, 255, 0, 0.3);
+}
+
+#debug-controls {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.debug-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.debug-row span {
+  width: 3rem;
+  font-size: 0.6rem;
+  color: #0f0;
+}
+
+.debug-row button {
+  padding: 0.15rem 0.35rem;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 3px;
+  color: #0f0;
+  font-family: inherit;
+  font-size: 0.6rem;
+  cursor: pointer;
+}
+
+.debug-row button:hover {
+  background: rgba(0, 255, 0, 0.25);
+}
+
+.debug-row button:active {
+  background: rgba(0, 255, 0, 0.4);
 }
 
 /* ── Responsive ── */

@@ -8,7 +8,7 @@
   <body>
     <!-- Loading Screen -->
     <div id="loading-screen">
-      <h1>LoL Map Stat</h1>
+      <h1>Chargement des beaux gosses</h1>
       <div id="loading-bar">
         <div id="loading-bar-fill"></div>
       </div>
@@ -36,9 +36,7 @@
       <div id="champion-card">
         <div id="champ-header">
           <div id="champ-name">—</div>
-          <div id="champ-role">—</div>
         </div>
-        <div id="champ-player">—</div>
         <span id="champ-rank">—</span>
 
         <div id="champ-stats">
@@ -78,13 +76,36 @@
       </div>
     </div>
 
-    <!-- Debug Overlay -->
+    <!-- Debug Overlay (hidden in production via JS) -->
     <div id="debug-panel">
       <div>Mouse: <span id="debug-mouse">—</span></div>
       <div>Cam pos: <span id="debug-cam-pos">—</span></div>
       <div>Cam rot: <span id="debug-cam-rot">—</span></div>
       <div>Zoom: <span id="debug-zoom">—</span></div>
+      <div>Champ pos: <span id="debug-champ-pos">—</span></div>
       <div>Champ rot: <span id="debug-champ-rot">—</span></div>
+      <button id="debug-copy">Copy config</button>
+
+      <div id="debug-controls">
+        <div class="debug-row">
+          <span>Cam</span>
+          <button data-action="cam-left">X-</button>
+          <button data-action="cam-right">X+</button>
+          <button data-action="cam-down">Y-</button>
+          <button data-action="cam-up">Y+</button>
+          <button data-action="cam-back">Z-</button>
+          <button data-action="cam-fwd">Z+</button>
+        </div>
+        <div class="debug-row">
+          <span>Champ</span>
+          <button data-action="champ-left">X-</button>
+          <button data-action="champ-right">X+</button>
+          <button data-action="champ-back">Z-</button>
+          <button data-action="champ-fwd">Z+</button>
+          <button data-action="champ-rotl">Rot-</button>
+          <button data-action="champ-rotr">Rot+</button>
+        </div>
+      </div>
     </div>
 
     <script type="module" src="/src/main.js"></script>

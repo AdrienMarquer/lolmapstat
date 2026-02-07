@@ -21,8 +21,8 @@ export function initScene() {
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
-    0.1,
-    500
+    0.05,
+    80
   );
   camera.position.set(0, 10, 30);
 
