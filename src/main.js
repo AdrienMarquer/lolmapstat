@@ -15,6 +15,9 @@ const isDev = import.meta.env.DEV;
 let updateDebug = () => {};
 
 if (isDev) {
+  // Show debug panel (hidden by default in CSS)
+  document.getElementById('debug-panel').style.display = 'block';
+
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.04);
@@ -126,9 +129,9 @@ if (isDev) {
     }
   };
 } else {
-  // Hide debug panel in production
+  // Remove debug panel in production
   const debugPanel = document.getElementById('debug-panel');
-  if (debugPanel) debugPanel.style.display = 'none';
+  if (debugPanel) debugPanel.remove();
 }
 
 async function init() {

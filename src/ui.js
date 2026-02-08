@@ -120,17 +120,17 @@ const LOADING_TEXTS = [
 let loadingTextIndex = 0;
 let loadingTextInterval = null;
 
-function startLoadingTexts() {
+// Start cycling messages immediately on module load
+(function startLoadingTexts() {
   const el = $('#loading-text');
   el.textContent = LOADING_TEXTS[0];
   loadingTextInterval = setInterval(() => {
     loadingTextIndex = (loadingTextIndex + 1) % LOADING_TEXTS.length;
     el.textContent = LOADING_TEXTS[loadingTextIndex];
   }, 2500);
-}
+})();
 
 export function updateLoadingProgress(progress) {
-  if (!loadingTextInterval) startLoadingTexts();
   const pct = Math.round(progress * 100);
   $('#loading-bar-fill').style.width = `${pct}%`;
   $('#loading-percent').textContent = `${pct}%`;

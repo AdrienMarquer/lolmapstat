@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 let loadingManager;
 let gltfLoader;
@@ -26,7 +27,12 @@ export function initLoader(onProgress) {
     if (allLoadedResolve) allLoadedResolve();
   };
 
+  // Draco decoder for compressed geometry
+  const dracoLoader = new DRACOLoader();
+  dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.5.7/');
+
   gltfLoader = new GLTFLoader(loadingManager);
+  gltfLoader.setDRACOLoader(dracoLoader);
 }
 
 export function loadModel(path) {

@@ -4,13 +4,14 @@
 // Map center: ~(-4, 0.04, 8)
 
 const API_URL =
-  'https://n8n.amrqr.fr/webhook/api/lol/accounts?names=Bolivern,GabeHCoud,Batours';
+  'https://n8n.amrqr.fr/webhook/api/lol/accounts?names=Bolivern,GabeHCoud,Batours,llodz';
 
 // Maps summoner names to champion IDs
 const SUMMONER_TO_CHAMPION = {
   Bolivern: 'ivern',
   GabeHCoud: 'mf',
   Batours: 'volibear',
+  llodz: 'zilean',
 };
 
 export const CHAMPIONS = [
@@ -68,6 +69,24 @@ export const CHAMPIONS = [
       lookAt: { x: -2.6, y: 0.2, z: 12.2 },
     },
   },
+  {
+    id: 'zilean',
+    name: 'Zilean',
+    role: 'Mid',
+    summonerName: 'llodz',
+    modelPath: '/models/zilean.glb',
+    position: { x: -7.5, y: 0.04, z: 7.4 },
+    rotation: { y: (-35.0 * Math.PI) / 180 },
+    scale: 0.00125,
+    rank: { tier: 'Gold', division: 'III', lp: 0 },
+    stats: null,
+    recentForm: null,
+    recentGames: null,
+    camera: {
+      position: { x: -7.8, y: 0.4, z: 7.7 },
+      lookAt: { x: -7.5, y: 0.2, z: 7.4 },
+    },
+  },
 ];
 
 export async function fetchAccountData() {
@@ -102,7 +121,7 @@ export async function fetchAccountData() {
   }
 }
 
-export const NAV_ORDER = ['ivern', 'volibear', 'mf'];
+export const NAV_ORDER = ['ivern', 'volibear', 'zilean', 'mf'];
 
 export const TIER_COLORS = {
   Iron: '#6e5644',

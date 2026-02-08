@@ -37,40 +37,52 @@ export function flyToChampion(id, onComplete) {
   const cp = champ.camera.position;
   const cl = champ.camera.lookAt;
 
+  // Calculate arc height based on distance between current and target positions
+  const dx = cp.x - camera.position.x;
+  const dz = cp.z - camera.position.z;
+  const dist = Math.sqrt(dx * dx + dz * dz);
+  // Lift proportional to distance: short hops barely rise, long flights go high
+  const arcHeight = Math.max(cp.y, camera.position.y) + dist * 0.25 + 0.5;
+
+  // Proxy object for the arc — GSAP will tween progress 0→1
+  const arc = { t: 0 };
+  const startPos = { x: camera.position.x, y: camera.position.y, z: camera.position.z };
+
   const tl = gsap.timeline({
     onComplete: () => {
       controls.enabled = true;
       isAnimating = false;
       if (onComplete) onComplete();
     },
-    onUpdate: () => {
-      controls.update();
-    },
   });
 
-  tl.to(
-    camera.position,
-    {
-      x: cp.x,
-      y: cp.y,
-      z: cp.z,
-      duration: 1.2,
-      ease: 'power3.inOut',
+  // Animate position along a vertical arc
+  tl.to(arc, {
+    t: 1,
+    duration: 1.4,
+    ease: 'power2.inOut',
+    onUpdate: () => {
+      const t = arc.t;
+      // Lerp X/Z linearly
+      camera.position.x = startPos.x + (cp.x - startPos.x) * t;
+      camera.position.z = startPos.z + (cp.z - startPos.z) * t;
+      // Y follows a parabolic arc: rises in the middle, lands at target height
+      const yLerp = startPos.y + (cp.y - startPos.y) * t;
+      const arcOffset = 4 * t * (1 - t) * (arcHeight - yLerp); // parabola peaking at t=0.5
+      camera.position.y = yLerp + arcOffset;
+      controls.update();
     },
-    0
-  );
+  }, 0);
 
-  tl.to(
-    controls.target,
-    {
-      x: cl.x,
-      y: cl.y,
-      z: cl.z,
-      duration: 1.2,
-      ease: 'power3.inOut',
-    },
-    0
-  );
+  // Animate lookAt target smoothly
+  tl.to(controls.target, {
+    x: cl.x,
+    y: cl.y,
+    z: cl.z,
+    duration: 1.4,
+    ease: 'power2.inOut',
+    onUpdate: () => controls.update(),
+  }, 0);
 }
 
 export function navigateLeft(onComplete) {
