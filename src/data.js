@@ -75,7 +75,7 @@ export const CHAMPIONS = [
     role: 'Mid',
     summonerName: 'llodz',
     modelPath: '/models/zilean.glb',
-    position: { x: -7.5, y: 0.04, z: 7.4 },
+    position: { x: -7.4, y: 0.04, z: 7.3 },
     rotation: { y: (-35.0 * Math.PI) / 180 },
     scale: 0.00125,
     rank: { tier: 'Gold', division: 'III', lp: 0 },
@@ -83,8 +83,8 @@ export const CHAMPIONS = [
     recentForm: null,
     recentGames: null,
     camera: {
-      position: { x: -7.8, y: 0.4, z: 7.7 },
-      lookAt: { x: -7.5, y: 0.2, z: 7.4 },
+      position: { x: -7.7, y: 0.4, z: 7.6 },
+      lookAt: { x: -7.4, y: 0.2, z: 7.3 },
     },
   },
 ];

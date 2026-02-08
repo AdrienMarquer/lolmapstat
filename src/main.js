@@ -168,6 +168,7 @@ async function init() {
       mat.depthWrite = true;
     }
 
+    mat.side = THREE.DoubleSide;
     mat.depthWrite = true;
     mat.needsUpdate = true;
 

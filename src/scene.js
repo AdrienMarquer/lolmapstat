@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Sky } from 'three/addons/objects/Sky.js';
 
 export let renderer, scene, camera;
 
@@ -12,20 +13,36 @@ export function initScene() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.8;
 
   // Scene
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a1a);
 
   // Camera
   camera = new THREE.PerspectiveCamera(
     60,
     window.innerWidth / window.innerHeight,
     0.05,
-    80
+    1000
   );
   camera.position.set(0, 10, 30);
+
+  // Sky — warm golden-hour LoL atmosphere
+  const sky = new Sky();
+  sky.scale.setScalar(450);
+  scene.add(sky);
+
+  const sunPosition = new THREE.Vector3();
+  const phi = THREE.MathUtils.degToRad(88); // sun near horizon
+  const theta = THREE.MathUtils.degToRad(220);
+  sunPosition.setFromSphericalCoords(1, phi, theta);
+
+  sky.material.uniforms.sunPosition.value.copy(sunPosition);
+  sky.material.uniforms.turbidity.value = 4;
+  sky.material.uniforms.rayleigh.value = 1.5;
+  sky.material.uniforms.mieCoefficient.value = 0.005;
+  sky.material.uniforms.mieDirectionalG.value = 0.8;
 
   // Lights
   const ambient = new THREE.AmbientLight(0xffffff, 0.6);
