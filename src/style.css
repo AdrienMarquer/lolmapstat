@@ -15,6 +15,7 @@ body {
   display: block;
   width: 100vw;
   height: 100vh;
+  background: linear-gradient(180deg, #5b7ea8 0%, #c8b88a 45%, #e8d8a8 70%, #d4c090 100%);
 }
 
 /* ── Loading Screen ── */

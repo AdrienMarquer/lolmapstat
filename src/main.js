@@ -2,25 +2,27 @@ import './style.css';
 import * as THREE from 'three';
 import { initScene, renderer, scene, camera } from './scene.js';
 import { initLoader, loadModel, onAllLoaded } from './loader.js';
-import { loadChampions, updateAnimations, getChampionModel } from './champions.js';
-import { initControls, updateControls, controls } from './camera.js';
+import { loadChampions, updateVisibleAnimation, getChampionModel } from './champions.js';
+import { initCamera, getCurrentChampionId, getIsAnimating, getControls } from './camera.js';
 import { initUI, updateLoadingProgress, hideLoadingScreen } from './ui.js';
 import { fetchAccountData } from './data.js';
-import { getCurrentChampionId } from './camera.js';
+import { requestRender, consumeRender } from './render.js';
 
 const clock = new THREE.Clock();
 const isDev = import.meta.env.DEV;
+
+// Re-export for convenience
+export { requestRender };
 
 // ── Debug (dev only) ──
 let updateDebug = () => {};
 
 if (isDev) {
-  // Show debug panel (hidden by default in CSS)
   document.getElementById('debug-panel').style.display = 'block';
 
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
-  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.04);
+  const groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const intersectPt = new THREE.Vector3();
 
   const debugMouse = document.getElementById('debug-mouse');
@@ -39,6 +41,7 @@ if (isDev) {
     const p = camera.position;
     const r = camera.rotation;
     const toDeg = THREE.MathUtils.radToDeg;
+    const controls = getControls();
     const dist = controls ? camera.position.distanceTo(controls.target).toFixed(2) : '?';
     const config = [
       `Champion: ${id}`,
@@ -59,8 +62,9 @@ if (isDev) {
     if (!action) return;
 
     const m = getChampionModel(getCurrentChampionId());
+    const controls = getControls();
 
-    if (action.startsWith('cam-')) {
+    if (action.startsWith('cam-') && controls) {
       const t = controls.target;
       switch (action) {
         case 'cam-left':  camera.position.x -= STEP; t.x -= STEP; break;
@@ -83,6 +87,7 @@ if (isDev) {
         case 'champ-rotr':  m.rotation.y -= THREE.MathUtils.degToRad(ROT_STEP); break;
       }
     }
+    requestRender();
   });
 
   const keysPressed = {};
@@ -108,6 +113,7 @@ if (isDev) {
     const toDeg = THREE.MathUtils.radToDeg;
     debugCamRot.textContent = `X: ${toDeg(r.x).toFixed(1)}°  Y: ${toDeg(r.y).toFixed(1)}°  Z: ${toDeg(r.z).toFixed(1)}°`;
 
+    const controls = getControls();
     if (controls) {
       const dist = camera.position.distanceTo(controls.target);
       debugZoom.textContent = dist.toFixed(2);
@@ -124,12 +130,11 @@ if (isDev) {
     if (champModel) {
       const speed = 2.0;
       const delta = clock.getDelta() || 0.016;
-      if (keysPressed['q']) champModel.rotation.y += speed * delta;
-      if (keysPressed['e']) champModel.rotation.y -= speed * delta;
+      if (keysPressed['q']) { champModel.rotation.y += speed * delta; requestRender(); }
+      if (keysPressed['e']) { champModel.rotation.y -= speed * delta; requestRender(); }
     }
   };
 } else {
-  // Remove debug panel in production
   const debugPanel = document.getElementById('debug-panel');
   if (debugPanel) debugPanel.remove();
 }
@@ -150,8 +155,8 @@ async function init() {
   const mapGltf = await loadModel('/models/map/SummonersRift.glb');
   const mapRoot = mapGltf.scene;
 
-  // Scale from LoL game units (~44k range) to scene units (~44)
-  mapRoot.scale.setScalar(0.001);
+  // New map export: ground is at Y≈17.2, shift it down so ground ≈ Y=0
+  mapRoot.position.set(0, -17.2, 0);
   scene.add(mapRoot);
 
   // Fix map materials for clean rendering
@@ -180,6 +185,13 @@ async function init() {
     child.frustumCulled = true;
   });
 
+  // Freeze materials after fix pass — no more GPU re-uploads
+  mapRoot.traverse((child) => {
+    if (child.isMesh && child.material) {
+      child.material.needsUpdate = false;
+    }
+  });
+
   // 5. Fetch live account data + Load champions (in parallel)
   const [_apiResult] = await Promise.all([fetchAccountData(), loadChampions()]);
 
@@ -189,13 +201,13 @@ async function init() {
   // 7. Pre-compile all shaders & upload textures while loading screen is visible
   await renderer.compileAsync(scene, camera);
 
-  // 8. Setup camera controls (after scene is populated)
-  initControls();
+  // 8. Setup camera (after scene is populated)
+  initCamera();
 
-  // 8. Setup UI interactions
+  // 9. Setup UI interactions
   initUI();
 
-  // 9. Hide loading, show scene
+  // 10. Hide loading, show scene
   hideLoadingScreen();
 
   // Debug: expose to console for calibration
@@ -206,7 +218,7 @@ async function init() {
     window.__THREE = THREE;
   }
 
-  // 10. Start render loop
+  // 11. Start render loop
   animate();
 }
 
@@ -214,10 +226,15 @@ function animate() {
   requestAnimationFrame(animate);
   const delta = clock.getDelta();
 
-  updateAnimations(delta);
-  updateControls();
+  // Only update the visible champion's animation mixer
+  const animTicked = updateVisibleAnimation(delta, getCurrentChampionId(), getIsAnimating());
+
   updateDebug();
-  renderer.render(scene, camera);
+
+  // Render only when something changed
+  if (animTicked || consumeRender()) {
+    renderer.render(scene, camera);
+  }
 }
 
 init().catch((err) => {

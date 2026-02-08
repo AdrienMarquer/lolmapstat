@@ -6,8 +6,12 @@ dist/
 # Source/working assets (not needed at runtime)
 assets/
 
-# Original source assets
+# Original unoptimized map
+public/models/map/SummonersRift_original.glb
 public/models/map/textures/
+
+# Playwright MCP artifacts
+.playwright-mcp/
 
 # Screenshots and test artifacts
 *.png

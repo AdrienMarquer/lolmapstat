@@ -1,7 +1,7 @@
-// New SummonersRift map: LoL game units scaled by 0.001
-// Playable area: X: ~-10..2, Z: ~2..14, Y ground: ~0.04
-// Blue base: ~(-9, 13), Red base: ~(1, 3)
-// Map center: ~(-4, 0.04, 8)
+// New SummonersRift map: ground at Y≈0 (offset by -17.2)
+// Playable area: X: ~-10..10, Z: ~-10..10
+// Blue base: ~(-8, 6), Red base: ~(8, -6)
+// Map center: ~(0, 0, 0)
 
 const API_URL =
   'https://n8n.amrqr.fr/webhook/api/lol/accounts?names=Bolivern,GabeHCoud,Batours,llodz';
@@ -21,16 +21,16 @@ export const CHAMPIONS = [
     role: 'Jungle',
     summonerName: 'Bolivern',
     modelPath: '/models/ivern.glb',
-    position: { x: -10.2, y: 0.04, z: 5.0 },
+    position: { x: -5.4, y: 0, z: -0.2 },
     rotation: { y: Math.PI * 2 },
-    scale: 0.00125,
+    scale: 0.0017,
     rank: { tier: 'Master', division: 'I', lp: 0 },
     stats: null,
     recentForm: null,
     recentGames: null,
     camera: {
-      position: { x: -10.6, y: 0.7, z: 5.6 },
-      lookAt: { x: -10.2, y: 0.2, z: 5.0 },
+      position: { x: -5.4, y: 0.7, z: 0.6 },
+      lookAt: { x: -5.4, y: 0.4, z: 0.1 },
     },
   },
   {
@@ -39,16 +39,16 @@ export const CHAMPIONS = [
     role: 'Top',
     summonerName: 'Batours',
     modelPath: '/models/volibear.glb',
-    position: { x: -12.1, y: 0.04, z: 2.2 },
-    rotation: { y: Math.PI * 1.37 },
-    scale: 0.00125,
+    position: { x: -7.0, y: 0, z: -7.4 },
+    rotation: { y: (246.6 * Math.PI) / 180 },
+    scale: 0.0017,
     rank: { tier: 'Gold', division: 'I', lp: 0 },
     stats: null,
     recentForm: null,
     recentGames: null,
     camera: {
-      position: { x: -12.9, y: 0.8, z: 2.0 },
-      lookAt: { x: -12.1, y: 0.2, z: 2.2 },
+      position: { x: -7.8, y: 0.8, z: -7.6 },
+      lookAt: { x: -7.36, y: 0.45, z: -7.45 },
     },
   },
   {
@@ -57,16 +57,16 @@ export const CHAMPIONS = [
     role: 'Bot',
     summonerName: 'GabeHCoud',
     modelPath: '/models/mf.glb',
-    position: { x: -2.6, y: 0.04, z: 12.2 },
+    position: { x: 8.8, y: 0, z: 8.0 },
     rotation: { y: (4.8 * Math.PI) / 180 },
-    scale: 0.0015,
+    scale: 0.0025,
     rank: { tier: 'Gold', division: 'III', lp: 0 },
     stats: null,
     recentForm: null,
     recentGames: null,
     camera: {
-      position: { x: -2.3, y: 0.6, z: 12.8 },
-      lookAt: { x: -2.6, y: 0.2, z: 12.2 },
+      position: { x: 9.2, y: 0.7, z: 8.7 },
+      lookAt: { x: 9.0, y: 0.39, z: 8.3 },
     },
   },
   {
@@ -75,16 +75,16 @@ export const CHAMPIONS = [
     role: 'Mid',
     summonerName: 'llodz',
     modelPath: '/models/zilean.glb',
-    position: { x: -7.4, y: 0.04, z: 7.3 },
-    rotation: { y: (-35.0 * Math.PI) / 180 },
-    scale: 0.00125,
+    position: { x: 0.8, y: 0, z: 0.6 },
+    rotation: { y: (10.0 * Math.PI) / 180 },
+    scale: 0.003,
     rank: { tier: 'Gold', division: 'III', lp: 0 },
     stats: null,
     recentForm: null,
     recentGames: null,
     camera: {
-      position: { x: -7.7, y: 0.4, z: 7.6 },
-      lookAt: { x: -7.4, y: 0.2, z: 7.3 },
+      position: { x: 0.8, y: 0.7, z: 1.4 },
+      lookAt: { x: 0.8, y: 0.4, z: 0.9 },
     },
   },
 ];

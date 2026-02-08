@@ -4,8 +4,7 @@ import { loadModel } from './loader.js';
 import { scene } from './scene.js';
 
 const championModels = {};
-const mixers = [];
-let animationsPaused = false;
+const championMixers = {}; // keyed by champion id
 
 export async function loadChampions() {
   const promises = CHAMPIONS.map(async (champ) => {
@@ -23,7 +22,7 @@ export async function loadChampions() {
       const mixer = new THREE.AnimationMixer(model);
       const clip = gltf.animations[0];
       mixer.clipAction(clip).play();
-      mixers.push(mixer);
+      championMixers[champ.id] = mixer;
     }
 
     model.name = champ.id;
@@ -34,15 +33,26 @@ export async function loadChampions() {
   await Promise.all(promises);
 }
 
-export function updateAnimations(delta) {
-  if (animationsPaused) return;
-  for (const mixer of mixers) {
-    mixer.update(delta);
-  }
-}
+/**
+ * Update only the visible champion's mixer. During transitions, update both
+ * the previous and next champion so both animate smoothly.
+ * Returns true if any mixer was updated (caller uses this for render-on-demand).
+ */
+export function updateVisibleAnimation(delta, currentId, isAnimating) {
+  const mixer = championMixers[currentId];
+  if (!mixer) return false;
 
-export function setAnimationsPaused(paused) {
-  animationsPaused = paused;
+  mixer.update(delta);
+
+  // During fly-to transitions we don't know the "previous" champion here,
+  // so just update all mixers — transitions are short (1.4s) and rare
+  if (isAnimating) {
+    for (const id in championMixers) {
+      if (id !== currentId) championMixers[id].update(delta);
+    }
+  }
+
+  return true;
 }
 
 export function getChampionModel(id) {
