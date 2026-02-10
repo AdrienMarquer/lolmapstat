@@ -28,6 +28,12 @@ export const CHAMPIONS = [
     stats: null,
     recentForm: null,
     recentGames: null,
+    companion: {
+      modelPath: '/models/daisy.glb',
+      position: { x: -5.8, y: 0, z: -1.9 },
+      rotation: { y: (30 * Math.PI) / 180 },
+      scale: 0.0018,
+    },
     camera: {
       position: { x: -5.4, y: 0.7, z: 0.6 },
       lookAt: { x: -5.4, y: 0.4, z: 0.1 },
