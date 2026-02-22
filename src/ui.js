@@ -1,10 +1,13 @@
-import { getChampionById, getNavNeighbors, TIER_COLORS } from './data.js';
+import { getChampionById, getNavNeighbors, TIER_COLORS, fetchAccountData } from './data.js';
 import {
   navigateLeft,
   navigateRight,
   getCurrentChampionId,
   getIsAnimating,
 } from './camera.js';
+
+const REFRESH_URL = 'https://n8n.amrqr.fr/webhook/api/lol/refresh';
+const REFRESH_DELAY_MS = 15_000;
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -19,9 +22,95 @@ export function initUI() {
     if (e.key === 'ArrowRight') navigate('right');
   });
 
+  // Refresh button
+  $('#refresh-btn').addEventListener('click', triggerRefresh);
+
   // Initial UI state
   updateChampionCard(getCurrentChampionId());
   updateNavLabels(getCurrentChampionId());
+}
+
+let refreshInProgress = false;
+
+async function triggerRefresh() {
+  if (refreshInProgress) return;
+  refreshInProgress = true;
+
+  const btn = $('#refresh-btn');
+  const label = $('#refresh-label');
+  const icon = $('#refresh-icon');
+
+  btn.disabled = true;
+  btn.classList.remove('rate-limited');
+  btn.classList.add('refreshing');
+  label.textContent = '…';
+
+  let res;
+  try {
+    res = await fetch(REFRESH_URL, { method: 'POST' });
+  } catch {
+    btn.classList.remove('refreshing');
+    label.textContent = 'Erreur';
+    setTimeout(() => resetRefreshBtn(btn, label, icon), 2500);
+    refreshInProgress = false;
+    return;
+  }
+
+  if (res.status === 429) {
+    let retryAfter = 0;
+    try {
+      const body = await res.json();
+      retryAfter = body.retryAfter ?? 0;
+    } catch { /* ignore */ }
+
+    btn.classList.remove('refreshing');
+    btn.classList.add('rate-limited');
+
+    if (retryAfter > 0) {
+      let remaining = retryAfter;
+      label.textContent = `${remaining}s`;
+      const countdown = setInterval(() => {
+        remaining -= 1;
+        label.textContent = `${remaining}s`;
+        if (remaining <= 0) {
+          clearInterval(countdown);
+          resetRefreshBtn(btn, label, icon);
+          refreshInProgress = false;
+        }
+      }, 1000);
+    } else {
+      label.textContent = 'Patienter…';
+      setTimeout(() => { resetRefreshBtn(btn, label, icon); refreshInProgress = false; }, 3000);
+    }
+    return;
+  }
+
+  // 200 — attente traitement backend (~10s), puis re-fetch
+  let remaining = Math.round(REFRESH_DELAY_MS / 1000);
+  label.textContent = `${remaining}s`;
+  const countdown = setInterval(() => {
+    remaining -= 1;
+    label.textContent = `${remaining}s`;
+    if (remaining <= 0) clearInterval(countdown);
+  }, 1000);
+
+  await new Promise((r) => setTimeout(r, REFRESH_DELAY_MS));
+  clearInterval(countdown);
+
+  await fetchAccountData();
+  updateChampionCard(getCurrentChampionId());
+
+  btn.classList.remove('refreshing');
+  label.textContent = 'OK !';
+  icon.textContent = '✓';
+  setTimeout(() => { resetRefreshBtn(btn, label, icon); refreshInProgress = false; }, 2000);
+}
+
+function resetRefreshBtn(btn, label, icon) {
+  btn.disabled = false;
+  btn.classList.remove('refreshing', 'rate-limited');
+  label.textContent = 'Actualiser';
+  icon.textContent = '↻';
 }
 
 function navigate(direction) {

@@ -274,6 +274,64 @@ body {
   color: rgba(224, 220, 208, 0.4);
 }
 
+/* ── Refresh Button ── */
+#refresh-btn {
+  position: absolute;
+  bottom: 2rem;
+  right: 1rem;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.6rem;
+  background: rgba(10, 10, 26, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 168, 50, 0.25);
+  border-radius: 8px;
+  color: rgba(200, 168, 50, 0.7);
+  font-family: inherit;
+  font-size: 0.65rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+#refresh-btn:hover:not(:disabled) {
+  background: rgba(200, 168, 50, 0.1);
+  border-color: rgba(200, 168, 50, 0.5);
+  color: #c8a832;
+}
+
+#refresh-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+#refresh-btn:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+#refresh-icon {
+  font-size: 0.85rem;
+  line-height: 1;
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+#refresh-btn.refreshing #refresh-icon {
+  animation: spin 1s linear infinite;
+}
+
+#refresh-btn.rate-limited {
+  border-color: rgba(224, 85, 85, 0.4);
+  color: #e05555;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Credit ── */
 #credit {
   position: absolute;
